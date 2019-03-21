@@ -1,0 +1,30 @@
+version: '3.4'
+volumes:
+  sqlvol:
+networks:
+  pcnet1:
+services:
+  db:
+    image: mysql:5.5
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - sqlvol:/var/lib/mysql
+    networks:
+      - pcnet1
+    deploy:
+      placement:
+        constraints:
+          - node.labels.hpe.storage == database
+  admin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=db
+    networks:
+      - pcnet1
+    ports:
+      - 8005:80
+    depends_on:
+      - db
+    deploy:
+      replicas: 1
